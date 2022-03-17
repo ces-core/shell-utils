@@ -11,11 +11,15 @@ MAN_FILES=`find $(MAN_DIRS) -type f 2>/dev/null`
 PKG_DIR=pkg
 PKG_NAME=$(NAME)-$(VERSION)
 PKG=$(PKG_DIR)/$(PKG_NAME).tar.gz
-SIG=$(PKG_DIR)/$(PKG_NAME).asc
+SIG=$(PKG_DIR)/$(PKG_NAME).tar.gz.asc
 
 PREFIX?=$(HOME)/.local
 INSTALL_DOC_DIR=$(PREFIX)/share/doc/$(PKG_NAME)
 INSTALL_MAN_DIR=$(PREFIX)/share/man
+
+all: clean man $(PKG) $(SIG)
+
+build: clean $(PKG)
 
 pkg:
 	mkdir -p $(PKG_DIR)
@@ -23,21 +27,18 @@ pkg:
 $(PKG): pkg
 	git archive --output=$(PKG) --prefix=$(PKG_NAME)/ HEAD
 
-build: $(PKG)
-
 man:
 	for dir in $(MAN_DIRS); do mkdir -p $$dir; done
 	for file in $(INSTALL_FILES); do help2man --no-info --no-discard-stderr $$file | nroff -man > $(MAN_DIRS)/$$(basename $$file).1; done
 
 $(SIG): $(PKG)
-	gpg --sign --detach-sign --armor $(PKG)
+	gpg --sign --detach-sign --armor -o $(SIG) $(PKG)
 
 sign: $(SIG)
 
 clean:
 	rm -f $(PKG) $(SIG)
-
-all: man $(PKG) $(SIG)
+	rm -rf man/*
 
 test:
 
