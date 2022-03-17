@@ -1,27 +1,37 @@
 #!/usr/bin/env bash
 
+NAME="$(basename $0)"
+
+version() {
+	echo '0.1.0'
+}
+
 usage() {
-	cat >&2 << EOF
-USAGE
+	cat << EOF
+$NAME - Converts a JSON file into POSIX shell environment variable declarations
+Each \`key\`: \`value\` pair will be converted to a \`key=value\` statement.
+If <file> is not provided or is \`-\`, it will read from stdin.
 
-	$0 [-x] [-f] <file>
-	$0 [-x] [-f] -
-	$0 [-x]
+Usage: $NAME [-hvx] [-f] <file>
+   or: $NAME [-hvx] [-f] -
+   or: $NAME [-hvx]
 
-DESCRIPTION
+Options:
+	-f, --file     The path to the file to read from.
+	-h, --help     Show this help text.
+	-v, --version  Show the version.
+	-x, --export   Prepend 'export' to the generated environment variables.
 
-	Converts a JSON file into environment variables.
-	Each \`key\`: \`value\` pair will be converted to a \`key=\$value\` statement.
-	If <file> is not provided or is \`-\`, it will read from stdin.
+Examples:
+	$NAME /path/to/file.json        Regular usage
+	cat /path/to/file.json | $NAME  Same as above
 
-OPTIONS
+	$NAME -x /path/to/file.jsoni    Export the variables (\`export VAR=VALUE\`)
 
-	-h, --help
-        Displays this help text.
-	-f, --file
-		The path to the file to read from.
-	-x, --export
-        Prepend 'export' to the generated environment variables.
+	$NAME -f /path/to/file.json     Can use the -f option
+	$NAME /path/to/file.jsoni       Or simply a positional argument
+
+	$NAME <<< "{"VAR":"VALUE"}"     JSON literal
 EOF
 }
 
@@ -30,13 +40,17 @@ json-to-env() {
 	local file
 	local exports=false
 
-	options=$(getopt -o hxf: -l help,export,file: --name "$0" -- "$@")
+	options=$(getopt -o f:hxv -l file:,help,export,version --name "$NAME" -- "$@")
 	eval set -- "$options"
 
 	while true; do
 		case "$1" in
 			-h|--help)
 				usage
+				exit 0
+				;;
+			-v|--version)
+				version
 				exit 0
 				;;
 			-x|--export)
