@@ -83,7 +83,7 @@ tag:
 	git push --tags
 
 release: build pkg sign tag
-	gh release create $(VERSION) $(PKG) $(SIG)
+	gh release create v$(VERSION) $(PKG) $(SIG)
 
 install: build
 	mkdir -p $(INSTALL_BIN_DIR)
