@@ -3,7 +3,7 @@
 NAME="$(basename $0)"
 
 version() {
-	echo '0.1.0'
+	echo "$VERSION"
 }
 
 usage() {
@@ -31,7 +31,7 @@ Examples:
 	$NAME -f /path/to/file.json     Can use the -f option
 	$NAME /path/to/file.jsoni       Or simply a positional argument
 
-	$NAME <<< "{"VAR":"VALUE"}"     JSON literal
+	$NAME <<< '{"VAR":"VALUE"}'     JSON literal
 EOF
 }
 

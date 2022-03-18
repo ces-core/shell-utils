@@ -1,12 +1,20 @@
 NAME=ces-shell-utils
-VERSION=0.1.0
+VERSION=0.1.1
 
-DIRS=bin
-INSTALL_DIRS=`find $(DIRS) -type d 2>/dev/null`
-INSTALL_FILES=`find $(DIRS) -type f 2>/dev/null`
-DOC_FILES=*.md
-MAN_DIRS=man/man1
+DIRS=src
+SRC_DIRS=`find $(DIRS) -type d 2>/dev/null`
+SRC_FILES=`find $(DIRS) -type f 2>/dev/null`
+SRC_DOC_FILES=*.md LICENSE
+SRC_SCRIPT_DIR=scripts
+SRC_SCRIPT_FILES=`find $(SRC_SCRIPT_DIR) -type f 2>/dev/null`
+
+BUILD_DIR=.build
+BIN_DIR=$(BUILD_DIR)/bin
+BIN_FILES=`find $(BIN_DIR) -type f 2>/dev/null`
+MAN_DIRS=$(BUILD_DIR)/share/man/man1
 MAN_FILES=`find $(MAN_DIRS) -type f 2>/dev/null`
+DOC_DIR=$(BUILD_DIR)/share/doc/$(PKG_NAME)
+DOC_FILES=`find $(DOC_DIR) -type f 2>/dev/null`
 
 PKG_DIR=pkg
 PKG_NAME=$(NAME)-$(VERSION)
@@ -14,31 +22,59 @@ PKG=$(PKG_DIR)/$(PKG_NAME).tar.gz
 SIG=$(PKG_DIR)/$(PKG_NAME).tar.gz.asc
 
 PREFIX?=$(HOME)/.local
+INSTALL_BIN_DIR=$(PREFIX)/bin
 INSTALL_DOC_DIR=$(PREFIX)/share/doc/$(PKG_NAME)
 INSTALL_MAN_DIR=$(PREFIX)/share/man
 
-all: clean man $(PKG) $(SIG)
+all: clean build pkg sign
 
-build: clean $(PKG)
+clean:
+	rm -f $(PKG) $(SIG)
+	rm -rf $(BUILD_DIR)/*
 
-pkg:
+build-dir:
+	mkdir -p $(BUILD_DIR);
+
+build-src:
+	for file in $(SRC_FILES); do \
+		mkdir -p $(BUILD_DIR)/$$(dirname $$file); \
+		sed -r 's/\$$VERSION/$(VERSION)/g' $$file > $(BUILD_DIR)/$$file; \
+		chmod a+x $(BUILD_DIR)/$$file; \
+	done
+	mv $(BUILD_DIR)/src $(BIN_DIR)
+
+build-man:
+	for dir in $(MAN_DIRS); do \
+		mkdir -p $$dir; \
+		for file in $(SRC_FILES); do \
+			VERSION=$(VERSION) help2man --no-info --no-discard-stderr $$file | nroff -man > $$dir/$$(basename $$file).1; \
+		done \
+	done
+
+build-doc:
+	mkdir -p $(DOC_DIR)
+	for file in $(SRC_DOC_FILES); do \
+		cp $$file $(DOC_DIR); \
+	done
+	cp $(SRC_DOC_FILES) $(BUILD_DIR)
+
+build-scripts:
+	cp $(SRC_SCRIPT_FILES) $(BUILD_DIR)
+
+build: build-dir clean build-src build-man build-doc build-scripts
+
+pkg-dir:
 	mkdir -p $(PKG_DIR)
 
-$(PKG): pkg
-	git archive --output=$(PKG) --prefix=$(PKG_NAME)/ HEAD
+$(PKG): pkg-dir
+	tar -czf $(PKG) $(BUILD_DIR) --transform "s#^$(BUILD_DIR)#$(PKG_NAME)#g"
 
-man:
-	for dir in $(MAN_DIRS); do mkdir -p $$dir; done
-	for file in $(INSTALL_FILES); do help2man --no-info --no-discard-stderr $$file | nroff -man > $(MAN_DIRS)/$$(basename $$file).1; done
+pkg: $(PKG)
 
 $(SIG): $(PKG)
 	gpg --sign --detach-sign --armor -o $(SIG) $(PKG)
 
 sign: $(SIG)
-
-clean:
-	rm -f $(PKG) $(SIG)
-	rm -rf man/*
 
 test:
 
@@ -46,20 +82,24 @@ tag:
 	git tag v$(VERSION)
 	git push --tags
 
-release: man $(PKG) $(SIG) tag
+release: build pkg sign tag
+	gh release create --generate-notes $(VERSION) $(PKG) $(SIG)
 
-install:
-	for dir in $(INSTALL_DIRS); do mkdir -p $(PREFIX)/$$dir; done
-	for file in $(INSTALL_FILES); do cp $$file $(PREFIX)/$$file; done
+install: build
+	mkdir -p $(INSTALL_BIN_DIR)
 	mkdir -p $(INSTALL_DOC_DIR)
-	cp -r $(DOC_FILES) $(INSTALL_DOC_DIR)/
 	mkdir -p $(INSTALL_MAN_DIR)
+	cp -r $(BIN_FILES) $(INSTALL_BIN_DIR)/
+	cp -r $(DOC_FILES) $(INSTALL_DOC_DIR)/
 	cp -r $(MAN_FILES) $(INSTALL_MAN_DIR)/
-	for dir in $(MAN_DIRS); do cp -r $$dir $(INSTALL_MAN_DIR)/$$(basename $$dir); done
 
-uninstall:
-	for file in $(INSTALL_FILES); do rm -rf $(PREFIX)/$$file; done
+uninstall: build
+	for file in $(BIN_FILES); do \
+		find $(INSTALL_BIN_DIR) -name $$(basename $$file) -exec rm -rf -- '{}' +; \
+	done
+	for file in $(MAN_FILES); do \
+		find $(INSTALL_MAN_DIR) -name $$(basename $$file) -exec rm -rf -- '{}' +; \
+	done
 	rm -rf $(INSTALL_DOC_DIR)
-	for dir in $(MAN_DIRS); do rm -rf $(INSTALL_MAN_DIR)/$$(basename $$dir); done
 
-.PHONY: build sign clean test man tag release install uninstall all
+.PHONY: sign clean test tag release install uninstall all

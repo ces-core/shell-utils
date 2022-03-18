@@ -4,7 +4,37 @@ Home for Collateral Engineering Services utility shell scripts.
 
 ## Installation
 
+### From Released Packages
+
+Go to [releases](/clio-finance/shell-utils/releases) and download the latest `ces-shell-utils-x.y.z.tar.gz` file.
+
+Un-tar the release file with: 
+
+```bash
+tar -xzf ces-shell-utils-x.y.z.tar.gz
+```
+
+Run the `install.sh` script:
+```bash
+cd ces-shell-utils-x.y.z
+./install.sh
+```
+
+If you want to change the installation location, use the `$PREFIX` env var:
+
+```bash
+PREFIX=path/to/installation ./install.sh
+```
+
+To uninstall, run the `uninstall.sh` script:
+```bash
+cd ces-shell-utils-x.y.z
+./uninstall.sh
+```
+
 ### From Source
+
+See the required [dependencies](#requirements-1).
 
 Clone this repo and then run:
 
@@ -24,9 +54,20 @@ make
 PREFIX=path/to/installation make install
 ```
 
+To uninstall, run:
+```bash
+make uninstall
+```
+
 ## Commands
 
 ### `json-to-env`
+
+#### Requirements
+
+- [`jq`](https://github.com/stedolan/jq)
+
+#### Usage
 
 ```
 JSON‐TO‐ENV(1)                             User          Commands
@@ -86,3 +127,16 @@ json‐to‐env        0.1.0                        March        2022
 JSON‐TO‐ENV(1)
 
 ```
+
+## Contributing
+
+### Requirements
+
+- [`make`](https://www.gnu.org/software/make/): build tool.
+- [`sed`](https://www.gnu.org/software/sed/manual/sed.html): a steam editor.
+- [`help2man`](https://www.gnu.org/software/help2man/): generates man files from the `--help` text of commands.
+- [`nroff`](https://www.gnu.org/software/groff/): typesetting system that reads plain text mixed with formatting commands and produces formatted output.
+
+### Code Conduct
+
+TODO.
