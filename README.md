@@ -6,7 +6,7 @@ Home for Collateral Engineering Services utility shell scripts.
 
 ### From Released Packages
 
-Go to [releases](/clio-finance/shell-utils/releases) and download the latest `ces-shell-utils-x.y.z.tar.gz` file.
+Go to [releases](https://github.com/clio-finance/shell-utils/releases/latest) and download the latest `ces-shell-utils-x.y.z.tar.gz` file.
 
 Un-tar the release file with: 
 
