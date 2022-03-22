@@ -88,15 +88,17 @@ function changelog-to-json() {
   [ -z "$changelog" ] && die "$(usage)"
 
   local changelog_keys=$(seth --rpc-url="$rpc_url" call $changelog 'list()(bytes32[])')
-    local pairs=$({
-      while read -d, encoded_key; do
-        get-changelog-pair "$encoded_key" "$rpc_url" &
-      done <<<"$changelog_keys"
-      wait
-    } | sort)
-    pairs="{\"key\":\"version\",\"value\":\"$(seth --rpc-url="$rpc_url" call $changelog 'version()(string)')\"} ${pairs}"
+  local pairs=$({
+    while read -d, encoded_key; do
+      get-changelog-pair "$encoded_key" "$rpc_url" &
+    done <<<"${changelog_keys},"
+    # Notice there is an appended `,` above. That is because of a POSIX bug described here:
+    # https://mywiki.wooledge.org/BashPitfalls#IFS.3D.2C_read_-ra_fields_.3C.3C.3C_.22.24csv_line.22
+    wait
+  } | sort)
+  pairs="{\"key\":\"version\",\"value\":\"$(seth --rpc-url="$rpc_url" call $changelog 'version()(string)')\"} ${pairs}"
 
-    jq -s 'from_entries' <<<"$pairs"
+  jq -s 'from_entries' <<<"$pairs"
 }
 
 # Executes the function if it's been called as a script.
