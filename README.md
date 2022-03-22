@@ -4,9 +4,24 @@ Home for Collateral Engineering Services utility shell scripts.
 
 ## Installation
 
+### As Dependency
+
+The easiest way is to add this repo as a dependency to your own repo:
+
+```bash
+git submodule add https://github.com/clio-finance/shell-utils ./lib/shell-utils
+```
+
+Then you can reference all utilities through the `./lib/shell-utils/bin/` directory:
+
+```
+./lib/shell-utils/bin/json-to-env
+```
+
 ### From Released Packages
 
-Go to [releases](https://github.com/clio-finance/shell-utils/releases/latest) and download the latest `ces-shell-utils-x.y.z.tar.gz` file.
+Go to [releases](https://github.com/clio-finance/shell-utils/releases/latest) and download the latest
+`ces-shell-utils-x.y.z.tar.gz` file.
 
 Un-tar the release file with:
 
@@ -71,7 +86,7 @@ make uninstall
 
 #### Usage
 
-```
+```man
 JSON‐TO‐ENV(1)                             User          Commands
 JSON‐TO‐ENV(1)
 
@@ -125,9 +140,55 @@ EXAMPLES
        json‐to‐env <<< "{"VAR":"VALUE"}"
               JSON literal
 
-json‐to‐env        0.1.0                        March        2022
+json‐to‐env        0.2.0                        March        2022
 JSON‐TO‐ENV(1)
+```
 
+### `changelog-to-json`
+
+#### Requirements
+
+- [`jq`](https://github.com/stedolan/jq)
+- [`dapp.tools`](http://dapp.tools)
+
+#### Usage
+
+```man
+CHANGELOG‐TO‐JSON(1)                       User          Commands
+CHANGELOG‐TO‐JSON(1)
+
+NAME
+       changelog‐to‐json  ‐  manual  page  for  changelog‐to‐json
+0.2.0
+
+SYNOPSIS
+       changelog‐to‐json [‐‐rpc‐url <url>] <changelog_address>
+       changelog‐to‐json [‐hv]
+
+DESCRIPTION
+       changelog‐to‐json  ‐  Fetches  the  info from the on‐chain
+changelog at
+       <changelog_address> and extract it into a JSON file.
+
+OPTIONS
+       ‐h, ‐‐help
+              Show this help text.
+
+       ‐v, ‐‐version Show the version.
+
+       ‐‐rpc‐url
+              Sets the RPC URL for the chain where the  changelog
+is  deployed.
+              If   ommited,   it   uses   the   value   for   the
+‘$ETH_RPC_URL‘ env var.
+
+EXAMPLES
+       changelog‐to‐json
+0x7EafEEa64bF6F79A79853F4A660e0960c821BA50
+              Fetches the info from CES Goerli MCD
+
+changelog‐to‐json        0.2.0                  March        2022
+CHANGELOG‐TO‐JSON(1)
 ```
 
 ## Contributing
