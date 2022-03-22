@@ -81,7 +81,7 @@ tag:
 	git tag v$(VERSION)
 	git push --tags
 
-release: build pkg sign tag
+release:
 	gh release create v$(VERSION) $(PKG) $(SIG)
 
 install: build
@@ -101,4 +101,4 @@ uninstall: build
 	done
 	rm -rf $(INSTALL_DOC_DIR)
 
-.PHONY: sign clean test tag release install uninstall all
+.PHONY: clean test release install uninstall all

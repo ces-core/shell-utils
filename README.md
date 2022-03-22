@@ -2,6 +2,28 @@
 
 Home for Collateral Engineering Services utility shell scripts.
 
+<!-- vim-markdown-toc GFM -->
+
+* [Installation](#installation)
+  * [As Dependency](#as-dependency)
+  * [From Released Packages](#from-released-packages)
+  * [From Source](#from-source)
+* [Commands](#commands)
+  * [`json-to-env`](#json-to-env)
+    * [Requirements](#requirements)
+    * [Usage](#usage)
+  * [`changelog-to-json`](#changelog-to-json)
+    * [Requirements](#requirements-1)
+    * [Usage](#usage-1)
+* [Contributing](#contributing)
+  * [How To](#how-to)
+    * [Add a New Utility](#add-a-new-utility)
+    * [Make a Release](#make-a-release)
+  * [Requirements](#requirements-2)
+  * [Code Conduct](#code-conduct)
+
+<!-- vim-markdown-toc -->
+
 ## Installation
 
 ### As Dependency
@@ -162,13 +184,16 @@ NAME
 0.2.0
 
 SYNOPSIS
-       changelog‐to‐json [‐‐rpc‐url <url>] <changelog_address>
+       changelog‐to‐json [‐‐rpc‐url <url>] [<changelog_address>]
        changelog‐to‐json [‐hv]
 
 DESCRIPTION
        changelog‐to‐json  ‐  Fetches  the  info from the on‐chain
 changelog at
-       <changelog_address> and extract it into a JSON file.
+       <changelog_address> and extract it into a JSON  file.   If
+<changelog_ad‐
+       dress>  is  not  provided,  it  will  attempt to read from
+stdin.
 
 OPTIONS
        ‐h, ‐‐help
@@ -177,15 +202,22 @@ OPTIONS
        ‐v, ‐‐version Show the version.
 
        ‐‐rpc‐url
-              Sets the RPC URL for the chain where the  changelog
-is  deployed.
+              Sets  the RPC URL for the chain where the changelog
+is deployed.
               If   ommited,   it   uses   the   value   for   the
 ‘$ETH_RPC_URL‘ env var.
 
 EXAMPLES
-       changelog‐to‐json
-0x7EafEEa64bF6F79A79853F4A660e0960c821BA50
+       changelog‐to‐json \
+         0x7EafEEa64bF6F79A79853F4A660e0960c821BA50
               Fetches the info from CES Goerli MCD
+
+       jq ‐r ’.CHANGELOG’ ’addresses.json’ | changelog‐to‐json
+              When the address is extracted  from  another  file,
+it  can  be passed in as input
+
+       changelog‐to‐json $(jq ‐r ’.CHANGELOG’ ’addresses.json’)
+              This is equivalent to the command above
 
 changelog‐to‐json        0.2.0                  March        2022
 CHANGELOG‐TO‐JSON(1)
@@ -193,12 +225,39 @@ CHANGELOG‐TO‐JSON(1)
 
 ## Contributing
 
+### How To
+
+#### Add a New Utility
+
+Add a new file in the `./bin/` directory. The file should have no extension and it should be self-executable (i.e.:
+`#!/bin/bash` for bash scripts, `#!/bin/env python` for python scripts, `#!/bin/env node` for node.js scripts).
+
+Make sure the utility is properly documented and accepts at least the `-h/--help` and `-v/--version` options. See
+existing files for examples.
+
+#### Make a Release
+
+**NOTICE:** To be able to run the commands below you are required to have [`github-cli`](https://cli.github.com/)
+installed and properly configured.
+
+This repo uses [semver](https://semver.org/). To make a new release, update the `$VERSION` variable in `Makefile` to a
+proper value. After that, run in sequence:
+
+```bash
+make
+make tag
+make release
+```
+
+At this point, `github-cli` will prompt you about some details to document the release. Go to [releases](https://github.com/clio-finance/shell-utils/releases) for some inspiration.
+
 ### Requirements
 
 - [`make`](https://www.gnu.org/software/make/): build tool.
 - [`sed`](https://www.gnu.org/software/sed/manual/sed.html): a steam editor.
 - [`help2man`](https://www.gnu.org/software/help2man/): generates man files from the `--help` text of commands.
-- [`nroff`](https://www.gnu.org/software/groff/): typesetting system that reads plain text mixed with formatting commands and produces formatted output.
+- [`nroff`](https://www.gnu.org/software/groff/): typesetting system that reads plain text mixed with formatting
+commands and produces formatted output.
 
 ### Code Conduct
 

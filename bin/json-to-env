@@ -26,7 +26,7 @@ Examples:
   $NAME /path/to/file.json        Regular usage
   cat /path/to/file.json | $NAME  Same as above
 
-  $NAME -x /path/to/file.jsoni    Export the variables (\`export VAR=VALUE\`)
+  $NAME -x /path/to/file.json     Export the variables (\`export VAR=VALUE\`)
 
   $NAME -f /path/to/file.json     Can use the -f option
   $NAME /path/to/file.jsoni       Or simply a positional argument
