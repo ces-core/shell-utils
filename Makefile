@@ -1,5 +1,5 @@
 NAME=ces-shell-utils
-VERSION=0.2.0
+VERSION=0.2.1
 
 DIRS=bin
 SRC_DIRS=`find $(DIRS) -type d 2>/dev/null`
