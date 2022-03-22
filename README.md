@@ -8,7 +8,7 @@ Home for Collateral Engineering Services utility shell scripts.
 
 Go to [releases](https://github.com/clio-finance/shell-utils/releases/latest) and download the latest `ces-shell-utils-x.y.z.tar.gz` file.
 
-Un-tar the release file with: 
+Un-tar the release file with:
 
 ```bash
 tar -xzf ces-shell-utils-x.y.z.tar.gz
@@ -57,6 +57,8 @@ PREFIX=path/to/installation make install
 To uninstall, run:
 ```bash
 make uninstall
+# If you changed $PREFIX during installation you will have to do the same here:
+# PREFIX=path/to/installation make uninstall
 ```
 
 ## Commands

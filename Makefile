@@ -1,7 +1,7 @@
 NAME=ces-shell-utils
 VERSION=0.1.1
 
-DIRS=src
+DIRS=bin
 SRC_DIRS=`find $(DIRS) -type d 2>/dev/null`
 SRC_FILES=`find $(DIRS) -type f 2>/dev/null`
 SRC_DOC_FILES=*.md LICENSE
@@ -41,7 +41,6 @@ build-src:
 		sed -r 's/\$$VERSION/$(VERSION)/g' $$file > $(BUILD_DIR)/$$file; \
 		chmod a+x $(BUILD_DIR)/$$file; \
 	done
-	mv $(BUILD_DIR)/src $(BIN_DIR)
 
 build-man:
 	for dir in $(MAN_DIRS); do \
