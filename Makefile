@@ -66,7 +66,7 @@ pkg-dir:
 	mkdir -p $(PKG_DIR)
 
 $(PKG): pkg-dir
-	tar -czf $(PKG) $(BUILD_DIR) --transform "s#^$(BUILD_DIR)#$(PKG_NAME)#g"
+	cd $(BUILD_DIR) && tar -czf ../$(PKG) . && cd -
 
 pkg: $(PKG)
 
