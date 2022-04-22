@@ -30,7 +30,7 @@ EOF
 }
 
 function die() {
-  echo "$@" >&2
+  echo -e "$@" >&2
   exit 1
 }
 
@@ -48,34 +48,49 @@ function get-changelog-pair() {
 }
 
 function changelog-to-json() {
-  local options
-
-  options=$(getopt -o hv -l help,version,rpc-url: --name "$NAME" -- "$@")
-  eval set -- "$options"
-
   local rpc_url="$ETH_RPC_URL"
 
-  while true; do
-    case "$1" in
-      -h|--help)
+  local optspec="hv-:"
+
+  while getopts "$optspec" OPT; do
+    # support long options: https://stackoverflow.com/a/28466267/519360
+    if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
+      OPT="${OPTARG%%=*}"       # extract long option name
+      OPTARG="${OPTARG#$OPT}"   # extract long option argument (may be empty)
+      OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+    fi
+
+    case "$OPT" in
+      h | help)
         usage
         exit 0
         ;;
-      -v|--version)
+      v | version)
         version
         exit 0
         ;;
-      --rpc-url)
-        rpc_url="$2"
-        shift
+      rpc-url)
+        [ -z "$OPTARG" ] && {
+          echo -e "\n--rpc-url option is missing its argument\n"
+          usage
+          exit 1
+        }
+        rpc_url="$OPTARG"
         ;;
-      --)
-        shift
-        break
+      ??*)
+        # bad long option
+        echo -e "\nIllegal option --$OPT\n"
+        usage
+        exit 1
+        ;;
+      ?)
+        echo -e "\nIllegal option -${BOLD}$OPTARG${OFF}\n"
+        usage
+        exit 1
         ;;
     esac
-    shift
   done
+  shift $((OPTIND-1))
 
   local changelog
 

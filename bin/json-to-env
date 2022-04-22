@@ -29,6 +29,7 @@ Examples:
   $NAME -x /path/to/file.json     Export the variables (\`export VAR=VALUE\`)
 
   $NAME -f /path/to/file.json     Can use the -f option
+  $NAME --file=/path/to/file.json Do not forget the = sign when using the long form
   $NAME /path/to/file.jsoni       Or simply a positional argument
 
   $NAME <<< '{"VAR":"VALUE"}'     JSON literal
@@ -36,40 +37,57 @@ EOF
 }
 
 json-to-env() {
-  local options
   local file
   local exports=false
 
-  options=$(getopt -o f:hxv -l file:,help,export,version --name "$NAME" -- "$@")
-  eval set -- "$options"
+  local optspec="hxvf:-:"
 
-  while true; do
-    case "$1" in
-      -h|--help)
+  while getopts "$optspec" OPT; do
+    # support long options: https://stackoverflow.com/a/28466267/519360
+    if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
+      OPT="${OPTARG%%=*}"       # extract long option name
+      OPTARG="${OPTARG#$OPT}"   # extract long option argument (may be empty)
+      OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+    fi
+
+    case "$OPT" in
+      h | help)
         usage
         exit 0
         ;;
-      -v|--version)
+      v | version)
         version
         exit 0
         ;;
-      -x|--export)
+      x | export)
         exports=true
         ;;
-      -f|--file)
-        file="$2"
-        shift
+      f | file)
+        [ -z "$OPTARG" ] && {
+          echo -e "\n--file option is missing its argument\n"
+          usage
+          exit 1
+        }
+        file="$OPTARG"
         ;;
-      --)
-        shift
-        break
+      ??*)
+        # bad long option
+        echo -e "\nIllegal option --$OPT\n"
+        usage
+        exit 1
+        ;;
+      ?)
+        echo -e "\nIllegal option -${BOLD}$OPTARG${OFF}]\n"
+        usage
+        exit 1
         ;;
     esac
-    shift
   done
+  shift $((OPTIND-1))
 
   # If -f/--file is not used, <file> is the first positional argument
   # If it's not given or empty, then the script should read from stdin
+
   file="${file:-${1:-/dev/stdin}}"
   local output=$(
     jq -r 'to_entries | map(.key + "|" + (.value | tostring)) | .[]' "$file" |
