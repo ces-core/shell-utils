@@ -1,5 +1,5 @@
 NAME=ces-shell-utils
-VERSION=0.2.2
+VERSION=0.2.3
 
 DIRS=bin
 SRC_DIRS=`find $(DIRS) -type d 2>/dev/null`
@@ -38,7 +38,7 @@ build-dir:
 build-src:
 	for file in $(SRC_FILES); do \
 		mkdir -p $(BUILD_DIR)/$$(dirname $$file); \
-		sed -r 's/\$$VERSION/$(VERSION)/g' $$file > $(BUILD_DIR)/$$file; \
+		sed -r 's/\$$\{VERSION:-0.0.0\}/$(VERSION)/g' $$file > $(BUILD_DIR)/$$file; \
 		chmod a+x $(BUILD_DIR)/$$file; \
 	done
 
