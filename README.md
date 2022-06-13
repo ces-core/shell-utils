@@ -171,6 +171,7 @@ JSON‐TO‐ENV(1)
 #### Requirements
 
 - [`jq`](https://github.com/stedolan/jq)
+- [`foundry`](https://github.com/foundry-rs/foundry) (preferred, or)
 - [`dapp.tools`](http://dapp.tools)
 
 #### Usage
@@ -184,7 +185,7 @@ NAME
 0.2.0
 
 SYNOPSIS
-       changelog‐to‐json [‐‐rpc‐url <url>] [<changelog_address>]
+       changelog‐to‐json [<changelog_address>]
        changelog‐to‐json [‐hv]
 
 DESCRIPTION
@@ -200,12 +201,6 @@ OPTIONS
               Show this help text.
 
        ‐v, ‐‐version Show the version.
-
-       ‐‐rpc‐url
-              Sets  the RPC URL for the chain where the changelog
-is deployed.
-              If   ommited,   it   uses   the   value   for   the
-‘$ETH_RPC_URL‘ env var.
 
 EXAMPLES
        changelog‐to‐json \

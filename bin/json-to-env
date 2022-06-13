@@ -7,7 +7,7 @@ version() {
 }
 
 usage() {
-  cat << EOF
+  cat <<EOF
 $NAME - Converts a JSON file into POSIX shell environment variable declarations
 Each \`key\`: \`value\` pair will be converted to a \`key=value\` statement.
 If <file> is not provided or is \`-\`, it will read from stdin.
@@ -44,46 +44,46 @@ json-to-env() {
 
   while getopts "$optspec" OPT; do
     # support long options: https://stackoverflow.com/a/28466267/519360
-    if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
-      OPT="${OPTARG%%=*}"       # extract long option name
-      OPTARG="${OPTARG#$OPT}"   # extract long option argument (may be empty)
-      OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+    if [ "$OPT" = "-" ]; then # long option: reformulate OPT and OPTARG
+      OPT="${OPTARG%%=*}"     # extract long option name
+      OPTARG="${OPTARG#$OPT}" # extract long option argument (may be empty)
+      OPTARG="${OPTARG#=}"    # if long option argument, remove assigning `=`
     fi
 
     case "$OPT" in
-      h | help)
-        usage
-        exit 0
-        ;;
-      v | version)
-        version
-        exit 0
-        ;;
-      x | export)
-        exports=true
-        ;;
-      f | file)
-        [ -z "$OPTARG" ] && {
-          echo -e "\n--file option is missing its argument\n"
-          usage
-          exit 1
-        }
-        file="$OPTARG"
-        ;;
-      ??*)
-        # bad long option
-        echo -e "\nIllegal option --$OPT\n"
+    h | help)
+      usage
+      exit 0
+      ;;
+    v | version)
+      version
+      exit 0
+      ;;
+    x | export)
+      exports=true
+      ;;
+    f | file)
+      [ -z "$OPTARG" ] && {
+        echo -e "\n--file option is missing its argument\n"
         usage
         exit 1
-        ;;
-      ?)
-        echo -e "\nIllegal option -${BOLD}$OPTARG${OFF}]\n"
-        usage
-        exit 1
-        ;;
+      }
+      file="$OPTARG"
+      ;;
+    ??*)
+      # bad long option
+      echo -e "\nIllegal option --$OPT\n"
+      usage
+      exit 1
+      ;;
+    ?)
+      echo -e "\nIllegal option -${BOLD}$OPTARG${OFF}]\n"
+      usage
+      exit 1
+      ;;
     esac
   done
-  shift $((OPTIND-1))
+  shift $((OPTIND - 1))
 
   # If -f/--file is not used, <file> is the first positional argument
   # If it's not given or empty, then the script should read from stdin
@@ -94,7 +94,7 @@ json-to-env() {
       while IFS='|' read -r key value; do
         # If it's an address, make sure it's checksummed
         if [[ "$value" =~ '^0x[0-9a-fA-F]{40}$' ]]; then
-          PAIR="${key}=$(seth --to-checksum-address "${value}")"
+          PAIR="${key}=$(cast --to-checksum-address "${value}")"
         else
           PAIR="${key}=${value}"
         fi
